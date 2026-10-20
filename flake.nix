@@ -42,8 +42,18 @@
 
       # Binary Wrapping
       # Inject 'fzf' directly into the runtime PATH of the compiled Clingy binary.
+      #
+      # makeShellWrapper parses these as a FLAT argv, so each element must be a
+      # separate token. The required shape is 4 tokens -- `--prefix`, the
+      # variable name, the separator, and the value. Passing the whole thing as
+      # one string ("--prefix PATH : /nix/store/...") makes the hook's
+      # `case "$p"` fall through to `die "makeWrapper doesn't understand the
+      # arg ..."`. Same shape nixpkgs uses in e.g. firefox/wrapper.nix.
       makeWrapperArgs = [
-        "--prefix PATH : ${pkgs.lib.makeBinPath [pkgs.fzf]}"
+        "--prefix"
+        "PATH"
+        ":"
+        "${pkgs.lib.makeBinPath [pkgs.fzf]}"
       ];
     };
 
